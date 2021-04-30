@@ -1,4 +1,5 @@
-﻿namespace WebApiProject.Models
+﻿
+namespace WebApiProject.Models
 {
     public class GeoMessage
     {
