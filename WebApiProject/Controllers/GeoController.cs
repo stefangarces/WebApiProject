@@ -5,13 +5,15 @@ namespace WebApiProject.Controllers
 {
     public class GeoController : ControllerBase
     {
+        private readonly object Longitude;
+
         [HttpGet]
-        public ActionResult GetLatitude()
+        public ActionResult GetLongitudeLatitude()
         {
-            return null;
+            Longitude
         }
         [HttpGet]
-        public ActionResult GetLongitude()
+        public ActionResult GetComment()
         {
             return null;
         }
