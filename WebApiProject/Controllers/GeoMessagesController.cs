@@ -21,23 +21,21 @@ namespace WebApiProject.Controllers
 
         // GET: api/GeoMessages
         [HttpGet("/v1/geo-comments/{id}")]
-        public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessages()
+        public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessages(int id)
         {
-            return await _context.GeoMessages.ToListAsync();
+            var message = await _context.GeoMessages.FindAsync(id);
+
+            if (message == null)
+                return NotFound();
+
+            return Ok(message);
         }
 
         // GET: api/GeoMessages/5
         [HttpGet("/v1/geo-comments")]
-        public async Task<ActionResult<GeoMessage>> GetGeoMessage(int id)
+        public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessage()
         {
-            var geoMessage = await _context.GeoMessages.FindAsync(id);
-
-            if (geoMessage == null)
-            {
-                return NotFound();
-            }
-
-            return geoMessage;
+            return await _context.GeoMessages.ToListAsync();
         }
 
         // PUT: api/GeoMessages/5
@@ -76,10 +74,17 @@ namespace WebApiProject.Controllers
         [HttpPost("/v1/geo-comments")]
         public async Task<ActionResult<GeoMessage>> PostGeoMessage(GeoMessage geoMessage)
         {
-            _context.GeoMessages.Add(geoMessage);
+            var newGeoMessage = new GeoMessage
+            {
+                Message = geoMessage.Message,
+                Latitude = geoMessage.Latitude,
+                Longitude = geoMessage.Longitude
+            };
+
+            await _context.AddAsync(newGeoMessage);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGeoMessage", new { id = geoMessage.ID }, geoMessage);
+            return CreatedAtAction("GetGeoMessage", new { id = newGeoMessage.ID }, newGeoMessage);
         }
 
         // DELETE: api/GeoMessages/5

@@ -11,5 +11,6 @@ namespace WebApiProject.Data
 
         }
         public DbSet<GeoMessage> GeoMessages { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }
