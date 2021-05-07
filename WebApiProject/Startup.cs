@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using WebApiProject.Data;
 using WebApiProject.Models;
+using WebApiProject.Controllers;
+using System;
 
 namespace WebApiProject
 {
@@ -30,6 +32,7 @@ namespace WebApiProject
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApiProject", Version = "v1" });
+                c.EnableAnnotations();
             });
 
             services.AddDbContext<GeoDbContext>(options =>
@@ -38,7 +41,20 @@ namespace WebApiProject
             services.AddDefaultIdentity<MyUser>()
             .AddEntityFrameworkStores<GeoDbContext>();
 
+            services.AddAuthentication("MegaAuth")
+                .AddScheme<AuthenticationSchemeOptions, AuthController>("MegaAuth", null);
 
+           services.AddCors(options =>
+            {
+                options.AddPolicy("AnyOrigin",
+                    builder =>
+                    {
+                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost").AllowCredentials();
+
+                        builder.WithHeaders("*");
+                        builder.WithMethods("POST", "GET");
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,6 +70,8 @@ namespace WebApiProject
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
 

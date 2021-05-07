@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,19 +11,22 @@ using WebApiProject.Models;
 
 namespace WebApiProject.Controllers
 {
-    [Route("api/[controller]")]
+    [EnableCors("AnyOrigin")]
+    [Route("api/v1/GetAllGeoMessages")]
     [ApiController]
     public class GeoMessagesController : ControllerBase
     {
         private readonly GeoDbContext _context;
+        private readonly SignInManager<MyUser> _signInManager;
 
-        public GeoMessagesController(GeoDbContext context)
+        public GeoMessagesController(GeoDbContext context, SignInManager<MyUser> signInManager)
         {
             _context = context;
+            _signInManager = signInManager;
         }
 
         // GET: api/GeoMessages
-        [HttpGet("/v1/geo-comments/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessages(int id)
         {
             var message = await _context.GeoMessages.FindAsync(id);
@@ -32,7 +38,7 @@ namespace WebApiProject.Controllers
         }
 
         // GET: api/GeoMessages/5
-        [HttpGet("/v1/geo-comments")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessage()
         {
             return await _context.GeoMessages.ToListAsync();
@@ -40,7 +46,8 @@ namespace WebApiProject.Controllers
 
         // POST: api/GeoMessages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("/v1/geo-comments")]
+        [Authorize]
+        [HttpPost]
         public async Task<ActionResult<GeoMessage>> PostGeoMessage(GeoMessage geoMessage)
         {
             var newGeoMessage = new GeoMessage
