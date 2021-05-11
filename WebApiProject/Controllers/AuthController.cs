@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
@@ -25,7 +24,7 @@ namespace WebApiProject.Controllers
         ISystemClock clock,
         UserManager<MyUser> userManager
         )
-        :base(
+        : base(
             options, logger, encoder, clock)
         {
             _userManager = userManager;
@@ -53,7 +52,17 @@ namespace WebApiProject.Controllers
                 return AuthenticateResult.Fail("Error, wrong header");
             }
 
-            var identity = new ClaimsIdentity(Scheme.Name);
+            if (user == null ||
+                password == null ||
+                await _userManager.CheckPasswordAsync(user, password) == false)
+                return AuthenticateResult.Fail("Invalid Username or Password");
+
+            var claims = new List<Claim> {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName),
+            };
+
+            var identity = new ClaimsIdentity(claims, Scheme.Name);
             var principal = new ClaimsPrincipal(identity);
             var ticket = new AuthenticationTicket(principal, Scheme.Name);
 

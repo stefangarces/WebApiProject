@@ -25,8 +25,21 @@ namespace WebApiProject.Data
             await Database.EnsureDeletedAsync();
             await Database.EnsureCreatedAsync();
 
-            var user = new MyUser { UserName = "FirstUser", FirstName = "John", LastName = "Userman" };
+            var user = new MyUser
+            {
+                UserName = "FirstUser",
+                FirstName = "John",
+                LastName = "Userman"
+            };
+
+            var userWithAuth = new MyUser
+            {
+                UserName = "Admin",
+                FirstName = "George",
+                LastName = "Costanza"
+            };
             await userManager.CreateAsync(user);
+            await userManager.CreateAsync(userWithAuth, "Admin!123");
 
             var geoMessage = new GeoMessage
             {
