@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 using WebApiProject.Models;
@@ -14,7 +14,8 @@ namespace WebApiProject.Data
         {
 
         }
-        public DbSet<GeoMessage> GeoMessages { get; set; }     
+        public DbSet<GeoMessage> GeoMessages { get; set; }
+        public DbSet<GeoMessageV2> GeoMessagesV2 { get; set; }
         public DbSet<MyUser> Users { get; set; }
         public DbSet<Token> Tokens { get; set; }
 
