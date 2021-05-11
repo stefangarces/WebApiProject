@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
 using WebApiProject.Models;
+using WebApiProject.Models.V2;
 
 namespace WebApiProject.Data
 {
