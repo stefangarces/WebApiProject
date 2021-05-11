@@ -12,7 +12,7 @@ using WebApiProject.Models;
 namespace WebApiProject.Controllers.V2
 {
     [EnableCors("AnyOrigin")]
-    [Route("api/V2/GetAllGeoMessages")]
+    [Route("api/v1/GetAllGeoMessages")]
     [ApiController]
     public class GeoMessagesControllerV2 : ControllerBase
     {
