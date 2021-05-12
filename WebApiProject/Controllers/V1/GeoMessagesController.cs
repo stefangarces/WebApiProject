@@ -26,7 +26,11 @@ namespace WebApiProject.Controllers
             _context = context;
             _signInManager = signInManager;
         }
-
+        /// <summary>
+        /// Hämtar ett specifikt "Geo Message" efter ett ID.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         // GET: api/GeoMessages
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessages(int id)

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WebApiProject</name>
+    </assembly>
+    <members>
+        <member name="M:WebApiProject.Controllers.GeoMessagesController.GetGeoMessages(System.Int32)">
+            <summary>
+            Hämtar ett specifikt "Geo Message" efter ett ID.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

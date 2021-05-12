@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System;
+using System.IO;
 using WebApiProject.Controllers;
 using WebApiProject.Data;
 using WebApiProject.Models;
@@ -46,6 +47,8 @@ namespace WebApiProject
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "GeoMessageV1", Version = "v1" });
                 c.SwaggerDoc("v2", new OpenApiInfo { Title = "GeoMessageV2", Version = "v2" });
+                var path = Path.Combine(AppContext.BaseDirectory, "WebApiProject.xml");
+                c.IncludeXmlComments(path);
                 c.EnableAnnotations();
             });
 
