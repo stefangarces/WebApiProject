@@ -1,7 +1,0 @@
-﻿Todo-lista
-
-• En fungerande Web API enligt specifikationen i detta dokument ☐
-• Någon autentisering implementerad ☐
-• Någon versioneringsstrategi vald ☐
-• Handskriven och automatiserad dokumentation ska finnas ☐
-• Lägg upp länk till projekt och .zip på PingPong (alla i gruppen lägger upp samma) ☐

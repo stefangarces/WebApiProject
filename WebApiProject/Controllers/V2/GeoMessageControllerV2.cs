@@ -20,11 +20,13 @@ namespace WebApiProject.Controllers.V2
     {
         private readonly GeoDbContext _context;
         private readonly SignInManager<MyUser> _signInManager;
+        private readonly UserManager<MyUser> _userManager;
 
-        public GeoMessagesControllerV2(GeoDbContext context, SignInManager<MyUser> signInManager)
+        public GeoMessagesControllerV2(GeoDbContext context, SignInManager<MyUser> signInManager, UserManager<MyUser> userManager)
         {
             _context = context;
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         // GET: api/GeoMessages
@@ -49,20 +51,54 @@ namespace WebApiProject.Controllers.V2
         // POST: api/GeoMessages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize]
+        [EnableCors("AnyOrigin")]
         [HttpPost]
-        public async Task<ActionResult<GeoMessageV2>> PostGeoMessage(GeoMessageV2 geoMessage)
+        public async Task<ActionResult<GeoMessageV2>> PostGeoMessage(GeoMessageV2_DTO geoMessage)
         {
-            var newGeoMessage = new GeoMessageV2
+            var getUserId = _userManager.GetUserId(User);
+            var getUser = await _context.MyUsers.Where(i => i.Id == getUserId).FirstOrDefaultAsync();
+
+            var geoMessageV2DTO = new GeoMessageV2_DTO
             {
-                Message = geoMessage.Message,
+                Title = geoMessage.Title,
+                Body = geoMessage.Body,
+                Longitude = geoMessage.Longitude,
+                Latitude = geoMessage.Latitude
+            };
+
+            var returnMessageV2 = new Messages
+            {
+                Message = new MessageDTO
+                {
+                    Title = geoMessageV2DTO.Title,
+                    Author = getUser.FirstName + " " + getUser.LastName,
+                    Body = geoMessageV2DTO.Body
+                },
                 Latitude = geoMessage.Latitude,
                 Longitude = geoMessage.Longitude
             };
 
+            var newGeoMessage = new GeoMessage
+            {
+                Message = geoMessage.Body,
+                Latitude = returnMessageV2.Latitude,
+                Longitude = returnMessageV2.Longitude
+            };
+
+            var newGeoMessageV2 = new GeoMessageV2
+            {
+                Title = geoMessageV2DTO.Title,
+                Body = geoMessageV2DTO.Body,
+                Author = getUser.FirstName + " " + getUser.LastName,
+                Latitude = geoMessageV2DTO.Latitude,
+                Longitude = geoMessageV2DTO.Longitude,
+            };
+
             await _context.AddAsync(newGeoMessage);
+            await _context.AddAsync(newGeoMessageV2);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetGeoMessage", new { id = newGeoMessage.ID }, newGeoMessage);
+            return newGeoMessageV2;
         }
     }
 }

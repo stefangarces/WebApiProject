@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiProject.Data;
 using WebApiProject.Models;
+using WebApiProject.Models.V2;
 
 namespace WebApiProject.Controllers
 {
@@ -58,7 +59,22 @@ namespace WebApiProject.Controllers
                 Longitude = geoMessage.Longitude
             };
 
+            var geoMessageV2DTO = new Models.V1.GeoMessageV1_DTO
+            {
+                Message = newGeoMessage.Message,
+                Latitude = newGeoMessage.Latitude,
+                Longitude = newGeoMessage.Longitude
+            };
+
+            var newGeoMessageV2 = new GeoMessageV2
+            {
+                Latitude = geoMessageV2DTO.Latitude,
+                Longitude = geoMessageV2DTO.Longitude
+            };
+
+
             await _context.AddAsync(newGeoMessage);
+            await _context.AddAsync(newGeoMessageV2);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGeoMessage", new { id = newGeoMessage.ID }, newGeoMessage);
