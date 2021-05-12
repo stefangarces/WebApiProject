@@ -94,7 +94,6 @@ namespace WebApiProject.Controllers.V2
                 Longitude = geoMessageV2DTO.Longitude,
             };
 
-            await _context.AddAsync(newGeoMessage);
             await _context.AddAsync(newGeoMessageV2);
             await _context.SaveChangesAsync();
 
