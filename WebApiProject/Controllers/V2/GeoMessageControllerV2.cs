@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiProject.Data;
 using WebApiProject.Models;
+using WebApiProject.Models.V2;
 
 namespace WebApiProject.Controllers.V2
 {
@@ -28,9 +29,9 @@ namespace WebApiProject.Controllers.V2
 
         // GET: api/GeoMessages
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessages(int id)
+        public async Task<ActionResult<IEnumerable<GeoMessageV2>>> GetGeoMessages(int id)
         {
-            var message = await _context.GeoMessages.FindAsync(id);
+            var message = await _context.GeoMessagesV2.FindAsync(id);
 
             if (message == null)
                 return NotFound();
@@ -40,18 +41,18 @@ namespace WebApiProject.Controllers.V2
 
         // GET: api/GeoMessages/5
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GeoMessage>>> GetGeoMessage()
+        public async Task<ActionResult<IEnumerable<GeoMessageV2>>> GetGeoMessage()
         {
-            return await _context.GeoMessages.ToListAsync();
+            return await _context.GeoMessagesV2.ToListAsync();
         }
 
         // POST: api/GeoMessages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult<GeoMessage>> PostGeoMessage(GeoMessage geoMessage)
+        public async Task<ActionResult<GeoMessageV2>> PostGeoMessage(GeoMessageV2 geoMessage)
         {
-            var newGeoMessage = new GeoMessage
+            var newGeoMessage = new GeoMessageV2
             {
                 Message = geoMessage.Message,
                 Latitude = geoMessage.Latitude,
@@ -62,11 +63,6 @@ namespace WebApiProject.Controllers.V2
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetGeoMessage", new { id = newGeoMessage.ID }, newGeoMessage);
-        }
-
-        private bool GeoMessageExists(int id)
-        {
-            return _context.GeoMessages.Any(e => e.ID == id);
         }
     }
 }
