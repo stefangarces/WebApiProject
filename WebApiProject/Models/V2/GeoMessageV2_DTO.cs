@@ -7,8 +7,7 @@ namespace WebApiProject.Models.V2
 {
     public class GeoMessageV2_DTO
     {
-        public string Body { get; set; }
-        public string Title { get; set; }
+        public Messages Message { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
     }

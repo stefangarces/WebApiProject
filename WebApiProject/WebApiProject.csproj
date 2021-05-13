@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>C:\Users\stefa\source\repos\WebApiProject\WebApiProject\WebApiProject.xml</DocumentationFile>
+    <DocumentationFile>C:\Users\Jonatan\source\repos\WebApiProject\WebApiProject\WebApiProject.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

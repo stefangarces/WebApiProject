@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,9 +30,11 @@ namespace WebApiProject.Controllers.V2
             _userManager = userManager;
         }
 
+
+
         // GET: api/GeoMessages
         [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<GeoMessageV2>>> GetGeoMessages(int id)
+        public async Task<ActionResult<IEnumerable<GeoMessageV2>>> GetGeoMessage(int id)
         {
             var message = await _context.GeoMessagesV2.FindAsync(id);
 
@@ -41,63 +44,101 @@ namespace WebApiProject.Controllers.V2
             return Ok(message);
         }
 
+
+
         // GET: api/GeoMessages/5
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GeoMessageV2>>> GetGeoMessage()
+        public async Task<ActionResult<IEnumerable<GeoMessageV2>>> GetGeoMessages(double? minLon, double? maxLon, double? minLat, double? maxLat)
         {
-            return await _context.GeoMessagesV2.ToListAsync();
+            if (minLon == null || maxLon == null || minLat == null || maxLat == null)
+            {
+                var ListV1 = await _context.GeoMessages.ToListAsync();
+                var ListV2 = await _context.GeoMessagesV2.ToListAsync();
+
+                var megaList = formatV1(ListV1).Concat(formatV2(ListV2));
+                return Ok(megaList);
+            }
+            else
+            {
+                var ListV1 = await _context.GeoMessages.Where(e => e.Latitude >= minLat && e.Latitude <= maxLat && e.Longitude >= minLon && e.Longitude <= maxLon).ToListAsync();
+                var ListV2 = await _context.GeoMessagesV2.Where(e => e.Latitude >= minLat && e.Latitude <= maxLat && e.Longitude >= minLon && e.Longitude <= maxLon).ToListAsync();
+
+                var megaList = formatV1(ListV1).Concat(formatV2(ListV2));
+                return Ok(megaList);
+            }
+            // return await _context.GeoMessagesV2.ToListAsync();
         }
+
+
+
+
+        private IEnumerable<GeoMessageV2_DTO> formatV1(IEnumerable<GeoMessage> list)
+        {
+            foreach (var message in list)
+            {
+                var messageDTO = new GeoMessageV2_DTO
+                {
+                    Message = new Messages { Title = String.Join(" ", message.Message.Split(" ").Take(3).Select((s, i) => i == 2 ? s.Substring(0, s.Length / 2) : s)), 
+                    Body = message.Message, Author = "Bob" },
+                    Longitude = message.Longitude,
+                    Latitude = message.Latitude
+                };
+
+                yield return messageDTO;
+            }
+        }
+
+
+
+
+        private IEnumerable<GeoMessageV2_DTO> formatV2(IEnumerable<GeoMessageV2> list)
+        {
+            foreach (var message in list)
+            {
+                var messageDTO = new GeoMessageV2_DTO
+                {
+                    Message = new Messages { Title = message.Title, Body = message.Body, Author = message.Author },
+                    Longitude = message.Longitude,
+                    Latitude = message.Latitude
+                };
+                yield return messageDTO;
+            }
+        }
+
+
+
 
         // POST: api/GeoMessages
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [Authorize]
         [EnableCors("AnyOrigin")]
         [HttpPost]
-        public async Task<ActionResult<GeoMessageV2>> PostGeoMessage(GeoMessageV2_DTO geoMessage)
+        public async Task<ActionResult<GeoMessageV2_DTO>> PostGeoMessage(GeoMessageV2_Input_DTO message)
         {
-            var getUserId = _userManager.GetUserId(User);
-            var getUser = await _context.MyUsers.Where(i => i.Id == getUserId).FirstOrDefaultAsync();
-
-            var geoMessageV2DTO = new GeoMessageV2_DTO
+            var user = await _context.MyUsers.FindAsync(_userManager.GetUserId(User));
+            var newMessage = new GeoMessageV2()
             {
-                Title = geoMessage.Title,
-                Body = geoMessage.Body,
-                Longitude = geoMessage.Longitude,
-                Latitude = geoMessage.Latitude
+                Title = message.Title,
+                Body = message.Body,
+                Author = $"{user.FirstName} {user.LastName}",
+                Longitude = message.Longitude,
+                Latitude = message.Latitude
             };
-
-            var returnMessageV2 = new Messages
-            {
-                Message = new MessageDTO
-                {
-                    Title = geoMessageV2DTO.Title,
-                    Author = getUser.FirstName + " " + getUser.LastName,
-                    Body = geoMessageV2DTO.Body
-                },
-                Latitude = geoMessage.Latitude,
-                Longitude = geoMessage.Longitude
-            };
-
-            var newGeoMessage = new GeoMessage
-            {
-                Message = geoMessage.Body,
-                Latitude = returnMessageV2.Latitude,
-                Longitude = returnMessageV2.Longitude
-            };
-
-            var newGeoMessageV2 = new GeoMessageV2
-            {
-                Title = geoMessageV2DTO.Title,
-                Body = geoMessageV2DTO.Body,
-                Author = getUser.FirstName + " " + getUser.LastName,
-                Latitude = geoMessageV2DTO.Latitude,
-                Longitude = geoMessageV2DTO.Longitude,
-            };
-
-            await _context.AddAsync(newGeoMessageV2);
+            await _context.AddAsync(newMessage);
             await _context.SaveChangesAsync();
+            var messageDTO = new GeoMessageV2_DTO
+            {
+                Message = new Messages
+                {
+                    Body = newMessage.Body,
+                    Title = newMessage.Title,
+                    Author = newMessage.Author
+                },
+                Longitude = newMessage.Longitude,
+                Latitude = newMessage.Latitude
+            };
 
-            return newGeoMessageV2;
+            return CreatedAtAction(nameof(GetGeoMessage), new { id = newMessage.Id }, messageDTO);
         }
     }
 }
