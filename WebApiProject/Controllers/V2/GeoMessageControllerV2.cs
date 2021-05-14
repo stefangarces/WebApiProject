@@ -30,7 +30,14 @@ namespace WebApiProject.Controllers.V2
             _userManager = userManager;
         }
 
-
+        /// <summary>
+        /// Här hämtas alla meddelanden inom det område som specificerats.
+        /// </summary>
+        /// <param name="minLon">Min Longitude för meddelanden</param>
+        /// <param name="maxLon">Max longitude för meddelanden</param>
+        /// <param name="minLat">Min Latitude för meddelanden</param>
+        /// <param name="maxLat">Max latitude för meddelanden</param>
+        /// <returns>Returnerar meddelanden i JSON-objekt</returns>
 
         // GET: api/GeoMessages
         [HttpGet("{id}")]
